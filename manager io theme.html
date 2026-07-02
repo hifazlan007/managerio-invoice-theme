@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>View</title>
+<style>
+:root{
+  --bg:#f5f5f5;
+  --paper:#fff;
+  --green:#16a34a;
+  --green-dark:#15803d;
+  --border:#e5e7eb;
+  --muted:#6b7280;
+  --text:#111827;
+}
+body{
+  background-color:var(--bg);
+  display:flex;
+  margin:0;
+  padding:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+}
+main{
+  background-color:var(--paper);
+  margin:1rem 1.5rem;
+  border:1px solid #e5e5e5;
+  border-radius:5px;
+  box-shadow:0px 4px 6px rgb(0 0 0 / 0.05);
+  padding:2rem;
+  min-width:80ch;
+  width:100%;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#292524;
+    --paper:#1c1917;
+  }
+  main{
+    border:1px solid #0c0a09;
+    box-shadow:0px 4px 6px rgb(0 0 0 / 0.50);
+  }
+}
+@page{
+  size:A4;
+  margin:10mm;
+}
+@media print{
+  body{
+    background-color:initial;
+    display:initial;
+  }
+  main{
+    padding:0;
+    border:initial;
+    box-shadow:initial;
+    border-radius:initial;
+    margin:0;
+    min-width:initial;
+  }
+}
+.document{
+  width:100%;
+}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:2rem;
+  border-bottom:3px solid var(--green);
+  padding-bottom:1.5rem;
+  margin-bottom:2rem;
+}
+.company{
+  display:flex;
+  gap:1rem;
+  flex:1;
+}
+.logo{
+  max-width:140px;
+  max-height:90px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+.company-name{
+  font-size:1.75rem;
+  font-weight:700;
+  color:var(--green-dark);
+  margin-bottom:.5rem;
+}
+.company-address{
+  white-space:pre-line;
+  line-height:1.5;
+}
+.company-fields{
+  margin-top:.75rem;
+}
+.company-field{
+  font-size:.9rem;
+  margin:.2rem 0;
+}
+.doc-title{
+  text-align:right;
+  max-width:260px;
+  flex-shrink:0;
+}
+.doc-title h1{
+  margin:0;
+  font-size:2rem;
+  color:var(--green-dark);
+  word-break:break-word;
+}
+.subtitle{
+  color:var(--muted);
+}
+.status-badge{
+  display:inline-block;
+  margin-top:.75rem;
+  padding:.45rem .85rem;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:700;
+  max-width:100%;
+}
+.status-neutral{
+  background:#dcfce7;
+  color:#166534;
+}
+.status-positive{
+  background:#dcfce7;
+  color:#166534;
+}
+.status-negative{
+  background:#fecaca;
+  color:#991b1b;
+}
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  margin-bottom:2rem;
+}
+.card{
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1rem;
+}
+.card h3{
+  margin:0 0 .75rem;
+  color:var(--green-dark);
+}
+.kv{
+  display:grid;
+  grid-template-columns:160px 1fr;
+  gap:.25rem .75rem;
+}
+.kv-label{
+  color:var(--muted);
+}
+.kv-value{
+  font-weight:500;
+}
+.items-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:1rem;
+}
+.items-table thead th{
+  background:var(--green);
+  color:white;
+  padding:.8rem;
+  text-align:left;
+  font-size:.9rem;
+}
+.items-table td{
+  padding:.8rem;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+.items-table tr.total-row{
+  font-weight:700;
+  background:#f0fdf4;
+}
+.items-table tr.group-row{
+  background:#f9fafb;
+  font-weight:700;
+}
+.totals{
+  width:360px;
+  margin-left:auto;
+  margin-top:1.5rem;
+}
+.total-line{
+  display:flex;
+  justify-content:space-between;
+  padding:.5rem 0;
+  border-bottom:1px solid var(--border);
+}
+.total-line.emphasis{
+  font-size:1.1rem;
+  font-weight:700;
+  background:var(--green);
+  color:#fff;
+  padding:.85rem 1rem;
+  border-radius:6px;
+  border-bottom:none;
+}
+.footer{
+  margin-top:2rem;
+  padding-top:1rem;
+  border-top:1px solid var(--border);
+}
+.footer-block{
+  margin-bottom:1rem;
+}
+.business-footer{
+  margin-top:2rem;
+  padding-top:1rem;
+  border-top:2px solid var(--green);
+  color:var(--muted);
+  font-size:.9rem;
+  line-height:1.6;
+}
+a{
+  color:var(--green-dark);
+}
+@media (max-width:900px){
+  .header,
+  .info-grid{
+    grid-template-columns:1fr;
+    display:block;
+  }
+  .doc-title{
+    text-align:left;
+    margin-top:1rem;
+    max-width:none;
+  }
+  .totals{
+    width:100%;
+  }
+}
+</style>
+</head>
+<body>
+<main></main>
+<script>
+fetch('/api4/view-v1' + window.location.search, {
+  headers: { 'Accept': 'application/json' },
+  credentials: 'same-origin',
+})
+  .then(response => response.json())
+  .then(data => {
+    renderDocument(data);
+  });
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function renderImage(image, alt){
+  if(!image || !image.url) return '';
+  const width = image.width ? ` width="${image.width}"` : '';
+  const height = image.height ? ` height="${image.height}"` : '';
+  return `${image.url}`;
+}
+
+function renderLinkedContent(content, link){
+  if(!link || !link.url) return content;
+  return `${link.url}${content}</a>`;
+}
+
+function alignStyle(align){
+  switch(align){
+    case 'center': return 'text-align:center;';
+    case 'end': return 'text-align:end;';
+    case 'right': return 'text-align:right;';
+    default: return 'text-align:start;';
+  }
+}
+
+function leafColumns(columns){
+  const result = [];
+  (columns || []).forEach(col=>{
+    if(col.subcolumns && col.subcolumns.length){
+      result.push(...leafColumns(col.subcolumns));
+    } else {
+      result.push(col);
+    }
+  });
+  return result;
+}
+
+function renderField(field){
+  let content = '';
+  if(field.image){
+    content += renderImage(field.image, field.label);
+  }
+  if(field.text){
+    content += escapeHtml(field.text);
+  }
+  content = renderLinkedContent(content, field.link);
+
+  let nested = '';
+  if(field.fields && field.fields.length){
+    nested = field.fields.map(renderField).join('');
+  }
+
+  return `
+    <div class="company-field">
+      <strong>${escapeHtml(field.label)}</strong>
+      ${content ? ': ' + content : ''}
+      ${nested}
+    </div>
+  `;
+}
+
+function getTopFields(fields){
+  return (fields || []).filter(f => f.displayAtTheTop);
+}
+
+function getBodyFields(fields){
+  return (fields || []).filter(f => !f.displayAtTheTop);
+}
+
+function renderRows(rows, columns){
+  let html = '';
+
+  (rows || []).forEach(row => {
+    if(row.rows && row.rows.length){
+      const title =
+        row.cells &&
+        row.cells[0] &&
+        row.cells[0].text
+          ? row.cells[0].text
+          : '';
+
+      html += `
+        <tr class="group-row">
+          <td colspan="${columns.length}">
+            ${escapeHtml(title)}
+          </td>
+        </tr>
+      `;
+
+      html += renderRows(row.rows, columns);
+      return;
+    }
+
+    const rowClass = row.isTotalRow ? 'total-row' : '';
+
+    html += `<tr class="${rowClass}">`;
+
+    columns.forEach((column,index)=>{
+      const cell = (row.cells || [])[index];
+
+      if(!cell){
+        html += '<td></td>';
+        return;
+      }
+
+      let content = '';
+
+      if(cell.image){
+        content += renderImage(cell.image, cell.text);
+      } else {
+        content += escapeHtml(cell.text || '');
+      }
+
+      content = renderLinkedContent(content, cell.link);
+
+      html += `
+        <td style="${alignStyle(column.align)}">
+          ${content}
+        </td>
+      `;
+    });
+
+    html += '</tr>';
+  });
+
+  return html;
+}
+
+function renderDocument(data){
+
+  document.title = [
+    data.title || '',
+    data.reference || '',
+    data.businessName || ''
+  ].filter(Boolean).join(' - ');
+
+  document.documentElement.dir = data.direction || 'ltr';
+
+  const business = data.business || {};
+  const recipient = data.recipient || {};
+  const topFields = getTopFields(data.fields);
+  const bodyFields = getBodyFields(data.fields);
+  const columns = leafColumns((data.table || {}).columns || []);
+
+  const statusClass =
+    data.status?.tone === 'positive'
+      ? 'status-positive'
+      : data.status?.tone === 'negative'
+      ? 'status-negative'
+      : 'status-neutral';
+
+  const html = `
+    <div class="document">
+
+      <div class="header">
+
+        <div class="company">
+
+          ${
+            business.logo
+              ? renderImage({url: business.logo}, business.name || '')
+              : ''
+          }
+
+          <div>
+
+            <div class="company-name">
+              ${escapeHtml(business.name || data.businessName || '')}
+            </div>
+
+            ${
+              business.address
+                ? `<div class="company-address">${escapeHtml(business.address)}</div>`
+                : ''
+            }
+
+            <div class="company-fields">
+              ${(business.fields || []).map(renderField).join('')}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="doc-title">
+          <h1>${escapeHtml(data.title || '')}</h1>
+
+          ${
+            data.reference
+              ? `<div>${escapeHtml(data.reference)}</div>`
+              : ''
+          }
+
+          ${(data.subtitles || [])
+            .map(x => `<div class="subtitle">${escapeHtml(x)}</div>`)
+            .join('')}
+
+          ${
+            data.status
+              ? `
+                <div class="status-badge ${statusClass}">
+                  ${escapeHtml(data.status.text)}
+                </div>
+              `
+              : ''
+          }
+        </div>
+
+      </div>
+
+      <div class="info-grid">
+
+        <div class="card">
+          <h3>Bill To</h3>
+
+          ${
+            recipient.name
+              ? `<div><strong>${escapeHtml(recipient.name)}</strong></div>`
+              : ''
+          }
+
+          ${
+            recipient.code
+              ? `<div>${escapeHtml(recipient.code)}</div>`
+              : ''
+          }
+
+          ${
+            recipient.address
+              ? `<div style="white-space:pre-line">${escapeHtml(recipient.address)}</div>`
+              : ''
+          }
+
+          ${
+            recipient.email
+              ? `<div>${escapeHtml(recipient.email)}</div>`
+              : ''
+          }
+        </div>
+
+        <div class="card">
+          <h3>Invoice Details</h3>
+
+          <div class="kv">
+            ${topFields.map(field => `
+              <div class="kv-label">${escapeHtml(field.label)}</div>
+              <div class="kv-value">${escapeHtml(field.text || '')}</div>
+            `).join('')}
+
+            ${bodyFields.map(field => `
+              <div class="kv-label">${escapeHtml(field.label)}</div>
+              <div class="kv-value">${escapeHtml(field.text || '')}</div>
+            `).join('')}
+          </div>
+        </div>
+
+      </div>
+
+      ${
+        data.table?.description
+          ? `<p>${escapeHtml(data.table.description)}</p>`
+          : ''
+      }
+
+      <table class="items-table">
+        <thead>
+          <tr>
+            ${columns.map(col => `
+              <th style="${alignStyle(col.align)}">
+                ${escapeHtml(col.label)}
+              </th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${renderRows(data.table?.rows || [], columns)}
+        </tbody>
+      </table>
+
+      ${
+        data.totals && data.totals.length
+          ? `
+            <div class="totals">
+              ${data.totals.map(total => `
+                <div class="total-line ${total.emphasis ? 'emphasis' : ''}">
+                  <span>${escapeHtml(total.label)}</span>
+                  <span>${escapeHtml(total.text)}</span>
+                </div>
+              `).join('')}
+            </div>
+          `
+          : ''
+      }
+
+      <div class="footer">
+        ${(data.footers || []).map(footer => `
+          <div class="footer-block">${footer}</div>
+        `).join('')}
+      </div>
+
+      <div class="business-footer">
+        <strong>${escapeHtml(business.name || data.businessName || '')}</strong><br>
+        ${business.address ? escapeHtml(business.address).replace(/\n/g,'<br>') : ''}
+        ${(business.fields || []).map(f =>
+          `<br><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(f.text || '')}`
+        ).join('')}
+      </div>
+
+    </div>
+  `;
+
+  document.querySelector('main').innerHTML = html;
+}
+</script>
+</body>
+</html>
